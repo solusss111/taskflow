@@ -26,7 +26,7 @@ class TaskBoard:
     def list_tasks(self) -> list[Task]:
         return self.tasks
 
-    def get_task(self, task_id) -> Task:
+    def get_task(self, task_id: int) -> Task:
         for task in self.tasks:
             if task.id == task_id:
                 return task

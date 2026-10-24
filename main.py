@@ -42,28 +42,53 @@ def show_all_tasks():
         print("Список задачи пусто.")
 
 def change_task_status():
-    try:
-        task_id = int(input("\nВыберите ID задачи: "))
-        board.get_task(task_id=task_id)
-        print("\n1. todo\n2. in progress\n3. done")
-        status = input("На какой статус вы хотите изменить?: ")
-        match status:
-            case "1":
-                status = "todo"
-            case "2":
-                status = "in_progress"
-            case "3":
-                status = "done"
-            case _:
-                print("Статус задачи остался неизменным.")
-                return
-        board.change_status(task_id=task_id, status=status)
-        print(f"Статус задачи {board.get_task(task_id).title} успешно изменено на {status}!")
-    except LookupError as e:
-        print(f"Ошибка: {e}")
+    show_all_tasks()
+    tasks = board.list_tasks
+    if tasks:
+        try:
+            task_id = int(input("\nВыберите ID задачи: "))
+            board.get_task(task_id=task_id)
+            print("\n1. todo\n2. in progress\n3. done")
+            status = input("На какой статус вы хотите изменить?: ")
+            match status:
+                case "1":
+                    status = "todo"
+                case "2":
+                    status = "in_progress"
+                case "3":
+                    status = "done"
+                case _:
+                    print("Статус задачи остался неизменным.")
+                    return
+            board.change_status(task_id=task_id, status=status)
+            print(f"Статус задачи {board.get_task(task_id).title} успешно изменено на {status}!")
+        except LookupError as e:
+            print(f"Ошибка: {e}")
+    else:
+        print("Нет задачи для изменение статуса.")
 
-# def delete_task():
-#     print("Выберите ID задачи которую вы хотите удалить: ")
+def delete_task():
+    show_all_tasks()
+    tasks = board.list_tasks
+    if tasks:
+        task_id = int(input(("\nВыберите ID задачи которую вы хотите удалить: ")))
+        try:
+            task = board.get_task(task_id=task_id)
+            confirm = input(f"Вы действительно хотите удалить задачу '{task.title}'? (да/нет): ")
+            match confirm:
+                case "да":
+                    board.delete_task(task_id=task_id)
+                case _:
+                    print("Действие отменено.")
+                    return
+        except LookupError as e:
+            print(f"Ошибка: {e}")
+        else:
+            print(f"Задача с ID {task_id} успешно удалено.")
+    else:
+        print("Нет задачи для удалении.")
+
+
 
 
 
@@ -93,14 +118,13 @@ def main():
                 show_all_tasks()
                 input("\nназад")
             case "3":
-                show_all_tasks()
+                
                 change_task_status()
                 input("\nназад")
             case "4":
-                ...
-                # show_all_tasks()
-                # delete_task()
-                # input("\nназад")
+                show_all_tasks()
+                delete_task()
+                input("\nназад")
             case "5":
                 ...
             case "6":
