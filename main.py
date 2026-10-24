@@ -18,17 +18,14 @@ def create_task():
         board.create_task(title, due_date)
     except ValueError as e:
         print(f"Ошибка: {e}")
-        input("\nназад")
-    else:
-        input("\nназад")
 
 
 def show_all_tasks():
-    label_create_task = '''
+    label_show_tasks = '''
 ========== Все задачи ==========
 '''
     sys.stdout.write("\033[H\033[2J")
-    print(label_create_task)
+    print(label_show_tasks)
     tasks = board.list_tasks
     if tasks:
         structured_data = [
@@ -43,7 +40,31 @@ def show_all_tasks():
         print(tabulate(structured_data, headers="keys", tablefmt="plain", stralign="left"))
     else:
         print("Список задачи пусто.")
-    input("\nназад")
+
+def change_task_status():
+    try:
+        task_id = int(input("\nВыберите ID задачи: "))
+        board.get_task(task_id=task_id)
+        print("\n1. todo\n2. in progress\n3. done")
+        status = input("На какой статус вы хотите изменить?: ")
+        match status:
+            case "1":
+                status = "todo"
+            case "2":
+                status = "in_progress"
+            case "3":
+                status = "done"
+            case _:
+                print("Статус задачи остался неизменным.")
+                return
+        board.change_status(task_id=task_id, status=status)
+        print(f"Статус задачи {board.get_task(task_id).title} успешно изменено на {status}!")
+    except LookupError as e:
+        print(f"Ошибка: {e}")
+
+# def delete_task():
+#     print("Выберите ID задачи которую вы хотите удалить: ")
+
 
 
 def main():
@@ -67,12 +88,19 @@ def main():
         match choice:
             case "1":
                 create_task()
+                input("\nназад")
             case "2":
                 show_all_tasks()
+                input("\nназад")
             case "3":
-                ...
+                show_all_tasks()
+                change_task_status()
+                input("\nназад")
             case "4":
                 ...
+                # show_all_tasks()
+                # delete_task()
+                # input("\nназад")
             case "5":
                 ...
             case "6":

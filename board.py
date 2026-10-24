@@ -1,5 +1,5 @@
 import re
-from datetime import date
+from datetime import date, datetime
 from models import Task
 
 class TaskBoard:
@@ -10,8 +10,12 @@ class TaskBoard:
     def create_task(self, title, due_date) -> None:
         if bool(re.match(r"^\d{4}-\d{2}-\d{2}$", due_date)):
             due_date = date.fromisoformat(due_date)
+            if due_date < date.today():
+                due_date = None
+                print("Задача будет бессрочной, так как указана прошедшая дата.")
         else:
-            print("Задача без срока ибо не указан либо неправильный.")
+            due_date = None
+            print("Задача будет бессрочной, так как неверный формат даты.")
 
         new_task = Task(self._next_id, title, due_date)
         self.tasks.append(new_task)
