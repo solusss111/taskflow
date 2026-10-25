@@ -1,30 +1,44 @@
 import sys
 from board import TaskBoard
 from tabulate import tabulate
+from datetime import date
+from models import Task
 
 
 board = TaskBoard()
+
+def clear_screen():
+    sys.stdout.write("\033[H\033[2J")
 
 def create_task():
     label_create_task = '''
 ========== Создать задачу ==========
 '''
-    sys.stdout.write("\033[H\033[2J")
+    clear_screen()
     print(label_create_task)
     try:
         title = input("Название: ")
-        due_date = input("Срок выполнения (ГГГГ-ММ-ДД, Enter — без срока): ")
-        
-        board.create_task(title, due_date)
+        raw = input("Срок выполнения (ГГГГ-ММ-ДД, Enter — без срока): ").strip()
+        due_date = date.fromisoformat(raw) 
+        if due_date < date.today():
+            due_date = None
+            print("Задача будет бессрочной, так как указана прошедшая дата.")
+        else:
+            due_date = None
+            print("Задача будет бессрочной, так как неверный формат даты.")
     except ValueError as e:
         print(f"Ошибка: {e}")
+    else:
+        board.create_task(title, due_date)
+        print("Задача создана")
 
-
-def show_tasks(tasks=board.list_tasks):
-    label_show_tasks = '''
-========== Все задачи ==========
+def show_tasks(tasks: list[Task] | None = None, title: str = "Все задачи"):
+    if tasks is None:
+        tasks = board.tasks
+    label_show_tasks = f'''
+========== {title} ==========
 '''
-    sys.stdout.write("\033[H\033[2J")
+    clear_screen()
     print(label_show_tasks)
     if tasks:
         structured_data = [
@@ -41,12 +55,11 @@ def show_tasks(tasks=board.list_tasks):
         print("Список задачи пусто.")
 
 def change_task_status():
-    show_tasks()
-    tasks = board.list_tasks
+    show_tasks(title='Статус какой задачи хотите изменить?')
+    tasks = board.tasks
     if tasks:
         try:
             task_id = int(input("\nВыберите ID задачи: "))
-            board.get_task(task_id=task_id)
             print("\n1. todo\n2. in progress\n3. done")
             status = input("На какой статус вы хотите изменить?: ")
             match status:
@@ -67,8 +80,8 @@ def change_task_status():
         print("Нет задачи для изменение статуса.")
 
 def delete_task():
-    show_tasks()
-    tasks = board.list_tasks
+    show_tasks(title="Какую задачу хотите удалить?")
+    tasks = board.tasks
     if tasks:
         try:
             task_id = int(input(("\nВыберите ID задачи которую вы хотите удалить: ")))
@@ -91,10 +104,10 @@ def show_tasks_by_status():
     label_choose_status = '''
 ========== Выберите статус ==========
 '''
-    sys.stdout.write("\033[H\033[2J")
+    clear_screen()
     print(f"{label_choose_status}\n1. todo\n2. in progress\n3. done")
     status = input("По какому статусу делать фильтр?: ")
-    sys.stdout.write("\033[H\033[2J")
+    clear_screen()
     match status:
         case "1":
             show_tasks(board.filter_by_status("todo"))
@@ -121,7 +134,7 @@ def main():
 '''
 
     while True:
-        sys.stdout.write("\033[H\033[2J")
+        clear_screen()
         print(label_main_menu)
         choice = input("Выберите действие: ")
         match choice:
@@ -141,7 +154,7 @@ def main():
                 show_tasks_by_status()
                 input("\nназад")
             case "6":
-                show_tasks(board.get_overdue())
+                show_tasks(board.get_overdue(), title="Просроченные задачи")
                 input("\nназад")
             case "0":
                 break
