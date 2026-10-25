@@ -61,7 +61,7 @@ def change_task_status():
                     return
             board.change_status(task_id=task_id, status=status)
             print(f"Статус задачи {board.get_task(task_id).title} успешно изменено на '{status}'")
-        except LookupError as e:
+        except (ValueError, LookupError) as e:
             print(f"Ошибка: {e}")
     else:
         print("Нет задачи для изменение статуса.")
@@ -70,17 +70,17 @@ def delete_task():
     show_tasks()
     tasks = board.list_tasks
     if tasks:
-        task_id = int(input(("\nВыберите ID задачи которую вы хотите удалить: ")))
         try:
+            task_id = int(input(("\nВыберите ID задачи которую вы хотите удалить: ")))
             task = board.get_task(task_id=task_id)
             confirm = input(f"Вы действительно хотите удалить задачу '{task.title}'? (да/нет): ")
-            match confirm:
+            match confirm.strip().lower():
                 case "да":
                     board.delete_task(task_id=task_id)
                 case _:
                     print("Действие отменено.")
                     return
-        except LookupError as e:
+        except (ValueError, LookupError) as e:
             print(f"Ошибка: {e}")
         else:
             print(f"Задача с ID {task_id} успешно удалено.")
@@ -143,8 +143,11 @@ def main():
             case "6":
                 show_tasks(board.get_overdue())
                 input("\nназад")
-            case _:
+            case "0":
                 break
+            case _:
+                print("Неизвестная команда")
+                input("\nНажмите Enter...")
         
             
     print("Программа остановлена.")
