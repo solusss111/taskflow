@@ -27,11 +27,11 @@ def create_task():
         due_date = date.fromisoformat(raw) if raw else None
         if due_date is not None and due_date < date.today():
             print("Срок не может быть в прошлом")
-        board.create_task(title, due_date)
+        created_task = board.create_task(title, due_date)
     except ValueError as e:
         print(f"Ошибка: {e}")
     else:
-        print("Задача создана")
+        print(f"Задача {created_task.id} создана")
 
 def show_tasks(tasks: list[Task] | None = None, title: str = "Все задачи"):
     if tasks is None:
@@ -56,14 +56,17 @@ def show_tasks(tasks: list[Task] | None = None, title: str = "Все задач�
         print("Список задач пуст.")
 
 def change_task_status():
-    show_tasks(title='Статус какой задачи хотите изменить?')
-    tasks = board.tasks
-    if tasks:
+    show_tasks(title="Список задач")
+    if board.tasks:
         try:
             task_id = int(input("\nВыберите ID задачи: "))
+            task = board.get_task(task_id)
             status = ask_status("На какой статус вы хотите изменить?")
+            if status is None:
+                print("Статус не изменён")
+                return
             board.change_status(task_id=task_id, status=status)
-            print(f"Статус задачи {board.get_task(task_id).title} успешно изменён на '{status}'")
+            print(f"Статус задачи {task.title} успешно изменён на '{status}'")
         except (ValueError, LookupError) as e:
             print(f"Ошибка: {e}")
     else:

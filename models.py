@@ -26,7 +26,7 @@ class Task:
     def status(self) -> str:
         return self._status
 
-    def set_status(self, status: str | None) -> None:
+    def set_status(self, status: str) -> None:
         if status not in self.ALLOWED_STATUSES:
             raise ValueError(
                 "Допустимые статусы: todo, in_progress, done"

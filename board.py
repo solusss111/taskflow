@@ -6,10 +6,11 @@ class TaskBoard:
         self.tasks: list[Task] = []
         self._next_id: int = 1
 
-    def create_task(self, title: str, due_date: date | None) -> None:
+    def create_task(self, title: str, due_date: date | None) -> Task:
         new_task = Task(self._next_id, title, due_date)
         self.tasks.append(new_task)
         self._next_id += 1
+        return new_task
 
     def get_task(self, task_id: int) -> Task:
         for task in self.tasks:
@@ -18,7 +19,7 @@ class TaskBoard:
             
         raise LookupError(f"Задача с ID {task_id} не найдена")
 
-    def change_status(self, task_id: int, status: str | None) -> None:
+    def change_status(self, task_id: int, status: str) -> None:
         task = self.get_task(task_id)
         task.set_status(status)
 
