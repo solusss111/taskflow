@@ -24,17 +24,13 @@ def create_task():
     try:
         title = input("Название: ")
         raw = input("Срок выполнения (ГГГГ-ММ-ДД, Enter — без срока): ").strip()
-        due_date = date.fromisoformat(raw) 
-        if due_date < date.today():
-            due_date = None
-            print("Задача будет бессрочной, так как указана прошедшая дата.")
-        else:
-            due_date = None
-            print("Задача будет бессрочной, так как неверный формат даты.")
+        due_date = date.fromisoformat(raw) if raw else None
+        if due_date is not None and due_date < date.today():
+            print("Срок не может быть в прошлом")
+        board.create_task(title, due_date)
     except ValueError as e:
         print(f"Ошибка: {e}")
     else:
-        board.create_task(title, due_date)
         print("Задача создана")
 
 def show_tasks(tasks: list[Task] | None = None, title: str = "Все задачи"):
@@ -65,7 +61,6 @@ def change_task_status():
     if tasks:
         try:
             task_id = int(input("\nВыберите ID задачи: "))
-            print("\n1. todo\n2. in progress\n3. done")
             status = ask_status("На какой статус вы хотите изменить?")
             board.change_status(task_id=task_id, status=status)
             print(f"Статус задачи {board.get_task(task_id).title} успешно изменён на '{status}'")
@@ -100,10 +95,13 @@ def show_tasks_by_status():
 ========== Выберите статус ==========
 '''
     clear_screen()
-    print(f"{label_choose_status}\n1. todo\n2. in progress\n3. done")
+    print(label_choose_status)
     status = ask_status("По какому статусу делать фильтр?")
+    if status is None:
+        print("Неверный выбор")
+        return
     clear_screen()
-    show_tasks(board.filter_by_status("todo"), f"Все задачи по статусу {status}")
+    show_tasks(board.filter_by_status(status=status), f"Все задачи по статусу {status}")
 
 
 def main():
@@ -143,7 +141,7 @@ def main():
                     print("Неизвестная команда")
             input("\nНажмите Enter, чтобы вернуться в меню")
     except (KeyboardInterrupt, EOFError):
-        print("Программа остановлена.")
+        pass
 
             
     print("Программа остановлена.")
