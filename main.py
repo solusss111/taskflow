@@ -105,9 +105,6 @@ def show_tasks_by_status():
         case _:
             print("Пожалуйста, выберите один из 3 вариантов.")
 
-    
-
-
 
 def main():
     label_main_menu = '''
@@ -144,7 +141,8 @@ def main():
                 show_tasks_by_status()
                 input("\nназад")
             case "6":
-                ...
+                show_tasks(board.get_overdue())
+                input("\nназад")
             case _:
                 break
         
