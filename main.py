@@ -10,6 +10,11 @@ board = TaskBoard()
 def clear_screen():
     sys.stdout.write("\033[H\033[2J")
 
+def ask_status(question: str) -> str | None:
+    STATUS_CHOICES = {"1": "todo", "2": "in_progress", "3": "done"}
+    print("\n1. todo\n2. in progress\n3. done")
+    return STATUS_CHOICES.get(input(f"{question}: ").strip())
+
 def create_task():
     label_create_task = '''
 ========== Создать задачу ==========
@@ -52,7 +57,7 @@ def show_tasks(tasks: list[Task] | None = None, title: str = "Все задач�
         ]
         print(tabulate(structured_data, headers="keys", tablefmt="plain", stralign="left"))
     else:
-        print("Список задачи пусто.")
+        print("Список задач пуст.")
 
 def change_task_status():
     show_tasks(title='Статус какой задачи хотите изменить?')
@@ -61,23 +66,13 @@ def change_task_status():
         try:
             task_id = int(input("\nВыберите ID задачи: "))
             print("\n1. todo\n2. in progress\n3. done")
-            status = input("На какой статус вы хотите изменить?: ")
-            match status:
-                case "1":
-                    status = "todo"
-                case "2":
-                    status = "in_progress"
-                case "3":
-                    status = "done"
-                case _:
-                    print("Статус задачи остался неизменным.")
-                    return
+            status = ask_status("На какой статус вы хотите изменить?")
             board.change_status(task_id=task_id, status=status)
-            print(f"Статус задачи {board.get_task(task_id).title} успешно изменено на '{status}'")
+            print(f"Статус задачи {board.get_task(task_id).title} успешно изменён на '{status}'")
         except (ValueError, LookupError) as e:
             print(f"Ошибка: {e}")
     else:
-        print("Нет задачи для изменение статуса.")
+        print("Нет задач для изменения статуса.")
 
 def delete_task():
     show_tasks(title="Какую задачу хотите удалить?")
@@ -96,9 +91,9 @@ def delete_task():
         except (ValueError, LookupError) as e:
             print(f"Ошибка: {e}")
         else:
-            print(f"Задача с ID {task_id} успешно удалено.")
+            print(f"Задача с ID {task_id} удалена.")
     else:
-        print("Нет задачи для удалении.")
+        print("Нет задач для удаления.")
 
 def show_tasks_by_status():
     label_choose_status = '''
@@ -106,17 +101,9 @@ def show_tasks_by_status():
 '''
     clear_screen()
     print(f"{label_choose_status}\n1. todo\n2. in progress\n3. done")
-    status = input("По какому статусу делать фильтр?: ")
+    status = ask_status("По какому статусу делать фильтр?")
     clear_screen()
-    match status:
-        case "1":
-            show_tasks(board.filter_by_status("todo"))
-        case "2":
-            show_tasks(board.filter_by_status("in_progress"))
-        case "3":
-            show_tasks(board.filter_by_status("done"))
-        case _:
-            print("Пожалуйста, выберите один из 3 вариантов.")
+    show_tasks(board.filter_by_status("todo"), f"Все задачи по статусу {status}")
 
 
 def main():
@@ -132,36 +119,32 @@ def main():
 
 0. Выйти
 '''
+    try:
+        while True:
+            clear_screen()
+            print(label_main_menu)
+            choice = input("Выберите действие: ")
+            match choice:
+                case "1":
+                    create_task()
+                case "2":
+                    show_tasks()
+                case "3":
+                    change_task_status()
+                case "4":
+                    delete_task()
+                case "5":
+                    show_tasks_by_status()
+                case "6":
+                    show_tasks(board.get_overdue(), title="Просроченные задачи")
+                case "0":
+                    break
+                case _:
+                    print("Неизвестная команда")
+            input("\nНажмите Enter, чтобы вернуться в меню")
+    except (KeyboardInterrupt, EOFError):
+        print("Программа остановлена.")
 
-    while True:
-        clear_screen()
-        print(label_main_menu)
-        choice = input("Выберите действие: ")
-        match choice:
-            case "1":
-                create_task()
-                input("\nназад")
-            case "2":
-                show_tasks()
-                input("\nназад")
-            case "3":
-                change_task_status()
-                input("\nназад")
-            case "4":
-                delete_task()
-                input("\nназад")
-            case "5":
-                show_tasks_by_status()
-                input("\nназад")
-            case "6":
-                show_tasks(board.get_overdue(), title="Просроченные задачи")
-                input("\nназад")
-            case "0":
-                break
-            case _:
-                print("Неизвестная команда")
-                input("\nНажмите Enter...")
-        
             
     print("Программа остановлена.")
 
