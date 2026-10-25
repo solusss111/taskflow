@@ -31,8 +31,4 @@ class TaskBoard:
         return [t for t in self.tasks if t.status == status]
 
     def get_overdue(self) -> list[Task]:
-        overdue_tasks = []
-        for task in self.tasks:
-            if task.is_overdue(date.today()):
-                overdue_tasks.append(task)
-        return overdue_tasks
+        return [t for t in self.tasks if t.is_overdue(date.today())]

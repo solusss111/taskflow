@@ -1,19 +1,25 @@
 import sys
-from board import TaskBoard
-from tabulate import tabulate
 from datetime import date
+
+from tabulate import tabulate
+
+from board import TaskBoard
 from models import Task
 
 
 board = TaskBoard()
 
+STATUS_CHOICES = {"1": "todo", "2": "in_progress", "3": "done"}
+
+
+def ask_status(question: str) -> str | None:
+    print("\n1. todo\n2. in progress\n3. done")
+    return STATUS_CHOICES.get(input(f"{question}: ").strip())
+
+
 def clear_screen():
     sys.stdout.write("\033[H\033[2J")
 
-def ask_status(question: str) -> str | None:
-    STATUS_CHOICES = {"1": "todo", "2": "in_progress", "3": "done"}
-    print("\n1. todo\n2. in progress\n3. done")
-    return STATUS_CHOICES.get(input(f"{question}: ").strip())
 
 def create_task():
     label_create_task = '''
@@ -33,6 +39,7 @@ def create_task():
     else:
         print(f"Задача {created_task.id} создана")
 
+
 def show_tasks(tasks: list[Task] | None = None, title: str = "Все задачи"):
     if tasks is None:
         tasks = board.tasks
@@ -44,16 +51,18 @@ def show_tasks(tasks: list[Task] | None = None, title: str = "Все задач�
     if tasks:
         structured_data = [
             {
-                "ID": task.id, 
-                "Название": task.title, 
+                "ID": task.id,
+                "Название": task.title,
                 "Статус": task.status,
                 "Срок": task.due_date if task.due_date else "без срока"
-            } 
+            }
             for task in tasks
         ]
-        print(tabulate(structured_data, headers="keys", tablefmt="plain", stralign="left"))
+        print(tabulate(structured_data, headers="keys",
+              tablefmt="plain", stralign="left"))
     else:
         print("Список задач пуст.")
+
 
 def change_task_status():
     show_tasks(title="Список задач")
@@ -72,14 +81,17 @@ def change_task_status():
     else:
         print("Нет задач для изменения статуса.")
 
+
 def delete_task():
     show_tasks(title="Какую задачу хотите удалить?")
     tasks = board.tasks
     if tasks:
         try:
-            task_id = int(input(("\nВыберите ID задачи которую вы хотите удалить: ")))
+            task_id = int(
+                input(("\nВыберите ID задачи которую вы хотите удалить: ")))
             task = board.get_task(task_id=task_id)
-            confirm = input(f"Вы действительно хотите удалить задачу '{task.title}'? (да/нет): ")
+            confirm = input(
+                f"Вы действительно хотите удалить задачу '{task.title}'? (да/нет): ")
             match confirm.strip().lower():
                 case "да":
                     board.delete_task(task_id=task_id)
@@ -93,6 +105,7 @@ def delete_task():
     else:
         print("Нет задач для удаления.")
 
+
 def show_tasks_by_status():
     label_choose_status = '''
 ========== Выберите статус ==========
@@ -103,8 +116,8 @@ def show_tasks_by_status():
     if status is None:
         print("Неверный выбор")
         return
-    clear_screen()
-    show_tasks(board.filter_by_status(status=status), f"Все задачи по статусу {status}")
+    show_tasks(board.filter_by_status(status=status),
+               f"Все задачи по статусу {status}")
 
 
 def main():
@@ -124,7 +137,7 @@ def main():
         while True:
             clear_screen()
             print(label_main_menu)
-            choice = input("Выберите действие: ")
+            choice = input("Выберите действие: ").strip()
             match choice:
                 case "1":
                     create_task()
@@ -137,7 +150,8 @@ def main():
                 case "5":
                     show_tasks_by_status()
                 case "6":
-                    show_tasks(board.get_overdue(), title="Просроченные задачи")
+                    show_tasks(board.get_overdue(),
+                               title="Просроченные задачи")
                 case "0":
                     break
                 case _:
@@ -146,8 +160,8 @@ def main():
     except (KeyboardInterrupt, EOFError):
         pass
 
-            
     print("Программа остановлена.")
+
 
 if __name__ == "__main__":
     main()
