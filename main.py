@@ -32,7 +32,7 @@ def create_task():
         raw = input("Срок выполнения (ГГГГ-ММ-ДД, Enter — без срока): ").strip()
         due_date = date.fromisoformat(raw) if raw else None
         if due_date is not None and due_date < date.today():
-            print("Срок не может быть в прошлом")
+            raise ValueError("Срок не может быть в прошлом")
         created_task = board.create_task(title, due_date)
     except ValueError as e:
         print(f"Ошибка: {e}")
