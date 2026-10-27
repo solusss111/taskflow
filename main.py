@@ -3,11 +3,15 @@ from datetime import date
 
 from tabulate import tabulate
 
-from board import TaskBoard
 from models import Task
+from storage import load_board, save_board
 
 
-board = TaskBoard()
+try:
+    board = load_board()
+except ValueError as e:
+    print(f"Ошибка: {e}")
+    sys.exit(1)
 
 STATUS_CHOICES = {"1": "todo", "2": "in_progress", "3": "done"}
 
@@ -37,6 +41,7 @@ def create_task():
     except ValueError as e:
         print(f"Ошибка: {e}")
     else:
+        save_board(board)
         print(f"Задача {created_task.id} создана")
 
 
@@ -75,6 +80,7 @@ def change_task_status():
                 print("Статус не изменён")
                 return
             board.change_status(task_id=task_id, status=status)
+            save_board(board)
             print(f"Статус задачи {task.title} успешно изменён на '{status}'")
         except (ValueError, LookupError) as e:
             print(f"Ошибка: {e}")
@@ -95,6 +101,7 @@ def delete_task():
             match confirm.strip().lower():
                 case "да":
                     board.delete_task(task_id=task_id)
+                    save_board(board)
                 case _:
                     print("Действие отменено.")
                     return

@@ -7,7 +7,7 @@ from board import TaskBoard
 def board():
     return TaskBoard()
 
-def tset_ids_increase(board):
+def test_ids_increase(board):
     first = board.create_task("A", None)
     second = board.create_task("B", None)
 

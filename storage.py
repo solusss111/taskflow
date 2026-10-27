@@ -10,7 +10,7 @@ DEFAULT_PATH = Path(__file__).parent / "data" / "tasks.json"
 
 def save_board(board: TaskBoard, path: Path = DEFAULT_PATH) -> None:
     payload = {
-        "next_id": board._next_id,
+        "next_id": board.next_id,
         "tasks": [task.to_dict() for task in board.tasks],
     }
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -33,5 +33,5 @@ def load_board(path: Path = DEFAULT_PATH) -> TaskBoard:
         raise ValueError(f"Не удалось прочитать файл {path}: {e}") from e
 
     max_id = max((t.id for t in board.tasks), default=0)
-    board._next_id = max(payload.get("next_id", 1), max_id + 1)
+    board.next_id = max(payload.get("next_id", 1), max_id + 1)
     return board

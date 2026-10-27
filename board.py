@@ -4,12 +4,12 @@ from models import Task
 class TaskBoard:
     def __init__(self) -> None:
         self.tasks: list[Task] = []
-        self._next_id: int = 1
+        self.next_id: int = 1
 
     def create_task(self, title: str, due_date: date | None) -> Task:
-        new_task = Task(self._next_id, title, due_date)
+        new_task = Task(self.next_id, title, due_date)
         self.tasks.append(new_task)
-        self._next_id += 1
+        self.next_id += 1
         return new_task
 
     def get_task(self, task_id: int) -> Task:

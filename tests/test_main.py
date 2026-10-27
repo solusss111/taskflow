@@ -1,7 +1,17 @@
 from datetime import date, timedelta
 
+import pytest
+
 import main
+import storage
 from board import TaskBoard
+
+
+@pytest.fixture(autouse=True)
+def isolated_storage(monkeypatch, tmp_path):
+    path = tmp_path / "tasks.json"
+    monkeypatch.setattr(main, "save_board",
+                        lambda board: storage.save_board(board, path))
 
 
 def fake_input(answers):
