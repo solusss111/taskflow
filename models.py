@@ -40,3 +40,21 @@ class Task:
             and self.due_date < on_date
             and self.status != "done"
         )
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "due_date": self.due_date.isoformat() if self.due_date else None,
+            "status": self.status,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Task":
+        raw_date = data.get("due_date")
+        return cls(
+            task_id=data["id"],
+            title=data["title"],
+            due_date=date.fromisoformat(raw_date) if raw_date else None,
+            status=data.get("status", "todo"),
+        )
